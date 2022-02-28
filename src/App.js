@@ -1,24 +1,46 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect, useState } from "react";
+import Header from './components/AppBar';
+import { createTheme, ThemeProvider } from '@mui/material';
+import { fetchPatientData } from "./external";
+import PatientTabs from "./pages/PatientTabs";
+import { convertToLineGraphFormat } from "./components/LineGraph";
+
+const theme = createTheme({
+  palette: {
+    type: 'light',
+    primary: {
+      main: '#278c79',
+      light: '#6d9147',
+    },
+    secondary: {
+      main: '#f50057',
+    },
+    background: {
+      paper: '#fbfcf9',
+    },
+    text: {
+      secondary: '#6d9147',
+    },
+  },
+});
+
 
 function App() {
+  const [patientData, setPatientData] = useState("");
+  const [lineGraphData, setLineGraphData] = useState("");
+  
+  useEffect(() => {
+    fetchPatientData().then(json => {
+      setPatientData(json);
+      setLineGraphData(convertToLineGraphFormat(json));
+    });
+  }, [])
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <ThemeProvider theme={theme}>
+        <Header />
+        <PatientTabs data={lineGraphData}/>
+    </ThemeProvider>
   );
 }
 
